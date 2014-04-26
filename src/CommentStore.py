@@ -1,12 +1,22 @@
 import xml.etree.ElementTree as ET
 
+__comment_sotre = None
+def comment_store():
+
+   """
+    comment store singleton 
+    default comment_store xml used
+   """
+   if __comment_sotre is None:
+        __comment_store = CommentStore()
+   return __comment_store
+
 class CommentStore():
 
     '''
     Stores comments that have been made
     '''
-    def __init__(self, passwords_file_path='passwords.txt', 
-                 data_file_path='comment_stor.xml'):
+    def __init__(self, data_file_path='comment_store.xml'):
         #OPEN FILEs and stuff 
         self._dirty = True
         self._comment_store_cache = None #XMLTree
