@@ -1,8 +1,17 @@
+#Auto Troll
+#Author: Ace Levenberg (acelevenberg@gmail.com)
+#----------------------------------------------------------------------------
+#"THE BEER-WARE LICENSE" (Revision 42):
+#<acelevenberg@gmail.com> wrote this file. As long as you retain this notice you
+#can do whatever you want with this stuff. If we meet some day, and you think
+#this stuff is worth it, you an buy me a beer in return Ace Levenberg
+#----------------------------------------------------------------------------
+
 import threading
 from Queue import Queue
 import praw
 
-class praw_submissions_wrapper():
+class praw_submission_wrapper():
     """
     wrapper to wrap submissions and comment objects together
     access to original object is available because im lazy
@@ -89,5 +98,7 @@ class AutoTrollThread(threading.Thread):
         params:
             trolled_response(string) the insult to respond
             comment_to_troll(PRAW comment/post object) to post to respond to 
+        returns:
+            praw wrapped comment
         """
         pass
