@@ -1,7 +1,7 @@
 import unittest
 import praw
 import sys
-import request.exceptions
+import requests
 
 from AutoTrollThread import AutoTrollThread, praw_submission_wrapper
 
@@ -34,7 +34,6 @@ class TestAutoTrollThread(unittest.TestCase):
             comment = self.troll.post('foo bar baz qux', random_wrapped)
         except request.exceptions.HTTPError as e:
             self.fail(msg=e.toString())
-        except 
     def get_login(self):
         with open('../src/passwords.txt') as password: 
             line = password.readline().split('=')
