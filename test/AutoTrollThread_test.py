@@ -70,7 +70,7 @@ class TestAutoTrollThread(unittest.TestCase):
         self.assertGreater(len(insult), 1)
 
     def get_login(self):
-        with open('../src/passwords.txt') as password:
+        with open('passwords.txt') as password:
             line = password.readline().split('=')
         login = line[0]
         password = line[1]

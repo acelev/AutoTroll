@@ -28,9 +28,10 @@ class AutoTrollThread(threading.Thread):
         throws (login failure) if the login fails
 
         """
+        print username
+        print password
         self.input_queue = Queue()
-
-        self.reddit = praw.Reddit(user_agent='AutoTroll v0.1')
+        self.reddit = praw.Reddit(user_agent='AutoTroll v0.1 user = ' + username)
         self.reddit.login(username, password)
 
     def send(self, comment_to_troll):
@@ -93,6 +94,9 @@ class AutoTrollThread(threading.Thread):
             reply_func = comment_to_troll.reply
         elif isinstance(comment_to_troll, praw.objects.Submission):
             reply_func = comment_to_troll.add_comment
+        else:
+            #Not sure what to return here...
+            pass
 
 
 
