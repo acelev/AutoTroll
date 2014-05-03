@@ -8,6 +8,9 @@
 #----------------------------------------------------------------------------
 
 import threading
+import urllib2
+import re
+import requests
 from Queue import Queue
 import praw
 
@@ -28,8 +31,6 @@ class AutoTrollThread(threading.Thread):
         throws (login failure) if the login fails
 
         """
-        print username
-        print password
         self.input_queue = Queue()
         self.reddit = praw.Reddit(user_agent='AutoTroll v0.1 user = ' + username)
         self.reddit.login(username, password)
@@ -90,14 +91,15 @@ class AutoTrollThread(threading.Thread):
             the comment object
         """
         reply_func = None
-        if isinstance(comment_to_troll, praw.objects.Comment):
+        # isinstance doesnt seem to like praw.objects.Comment
+        if hasattr(comment_to_troll, 'reply'):
             reply_func = comment_to_troll.reply
-        elif isinstance(comment_to_troll, praw.objects.Submission):
+        elif hasattr(comment_to_troll, 'add_comment'):
             reply_func = comment_to_troll.add_comment
         else:
-            #Not sure what to return here...
-            pass
-
+            # Not sure what to return here...
+            return
+        return reply_func(trolled_response)
 
 
 

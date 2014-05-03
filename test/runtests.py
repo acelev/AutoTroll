@@ -1,16 +1,23 @@
 import sys
 import os
-import unittest 
+import unittest
+
+
+def print_results(results):
+    for failure in results.failures:
+        test, fail = failure
+        print test
+        print "FAILED :"
+        print fail
+        print "_____________"
+    for error in results.errors:
+        print error
+        print" __________________"
 
 sys.path.insert(0, os.path.dirname("../src/AutoTroll.py"))
-result = unittest.TestResult()
-unittest.TestLoader().loadTestsFromName("AutoTrollThread_test").run(result)
-for failure in result.failures:
-    test, fail = failure
-    print test
-    print "FAILED REASON:"
-    print fail 
-    print "_____________"
-for error in result.errors:
-    print error
-    print" __________________"
+results = unittest.TestResult()
+unittest.TestLoader().loadTestsFromName("AutoTrollThread_test").run(results)
+print_results(results)
+results = unittest.TestResult()
+unittest.TestLoader().loadTestsFromName("CommentStore_test").run(results)
+print_results(results)
