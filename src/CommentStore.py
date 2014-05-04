@@ -8,6 +8,11 @@
 #----------------------------------------------------------------------------
 
 import csv
+import os
+import shutil
+
+from threading import Lock
+from tempfile import mkstemp
 
 __comment_sotre = None
 def comment_store():
@@ -24,11 +29,17 @@ class CommentStore():
 
     '''
     Stores comments that have been made
+    the constructor for this object should never be called.
+    instead the  singleton should be used because of the lock object
     '''
+    def set_data_path(self, data_path):
+        self.data_file_path = data_path
+
     def __init__(self, data_file_path='comment_store.csv'):
-        #OPEN FILEs and stuff
-        self._dirty = True
+        self._dirty = False
         self._comment_store_cache = dict()
+        self.lock = Lock()
+        self.data_file_path = data_file_path
 
     def store_comment(self,troll, chump, submissions_id, reponse_id, time):
         '''
@@ -40,7 +51,14 @@ class CommentStore():
                 reponse_id(string) the id of the response
                 time the time the resposne was made
         '''
-        pass
+        comment = [troll,submissions_id, reponse_id, time]
+        self._add_coment(chump, comment)
+        self._dirty = True
+
+    # unlocks the lock object inserts the comment in the cache
+    def _add_coment(self,chump,comment):
+        with self.lock:
+            self._comment_store_cache[chump] = comment
 
     def get_last_trolled_comment(self,chump):
         '''
@@ -56,4 +74,30 @@ class CommentStore():
         """
         writes the cache back to file
         """
-        pass
+        # No neec to write if nothing has changed from the file
+        if not self._dirty:
+            return
+        with open(self.data_file_path, 'wb+') as comment_file:
+            commentreader = csv.reader(comment_file, delimiter=',')
+            _ , path = mkstemp()
+            tempfile = open(path, 'wb+')
+            commentwriter = csv.writer(tempfile, delimiter=',')
+            with self.lock:
+                for line in commentreader:
+                    print line
+                    if line[0] in self._comment_store_cache:
+                        print line[0]
+                        commentwriter.writerow([line[0]] + \
+                                              self._comment_store_cache[line[0]])
+                        del self._comment_store_cache[line[0]]
+                    else:
+                        print line
+                        commentwriter.writerow(line)
+                for chump, comment in self._comment_store_cache.iteritems():
+                    print chump
+                    commentwriter.writerow([chump] + comment )
+        shutil.move(path, self.data_file_path)
+        tempfile.close()
+        self._dirty = False
+
+

@@ -40,11 +40,11 @@ class TestAutoTrollThread(unittest.TestCase):
     @patch('praw.objects.Submission')
     def test_AutoTrollPostSubmission(self, mock_submission):
         submission = mock_submission()
-        self.troll.post("foo bar baz quz", submission)
+        self.troll.post("foo bar baz qux", submission)
         # Make sure that the reply was one of the calls in the mock submission
         call = str(mock_submission.mock_calls[1])
         self.assertGreater(len(call), 1)
-        self.assertEquals('call().reply(\'foo bar baz quz\')', call)
+        self.assertEquals('call().reply(\'foo bar baz qux\')', call)
 
     def test_AutoTrollPostNotCommentOrSubmission(self):
         # not sure how this is suppose to respond yet
