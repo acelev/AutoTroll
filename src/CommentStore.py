@@ -66,9 +66,16 @@ class CommentStore():
         params:
             the chump to get the most recent comment
         returns:
-           the last comment to be trolled
+           the last comment/submission id to be trolled
         '''
-        pass
+        if chump in self._comment_store_cache:
+            return self._comment_store_cache[chump][1]
+        for line in self._read_from_file(self.data_file_path):
+            # add all of the chumnps we see to the cache
+            self._comment_store_cache[line[0]] = line[1:]
+            if line[0] == chump:
+                return self._comment_store_cache[line[0]][1]
+
 
     def _write_to_file(self):
         """
@@ -77,27 +84,38 @@ class CommentStore():
         # No neec to write if nothing has changed from the file
         if not self._dirty:
             return
-        with open(self.data_file_path, 'wb+') as comment_file:
-            commentreader = csv.reader(comment_file, delimiter=',')
-            _ , path = mkstemp()
-            tempfile = open(path, 'wb+')
-            commentwriter = csv.writer(tempfile, delimiter=',')
-            with self.lock:
-                for line in commentreader:
-                    print line
-                    if line[0] in self._comment_store_cache:
-                        print line[0]
-                        commentwriter.writerow([line[0]] + \
-                                              self._comment_store_cache[line[0]])
-                        del self._comment_store_cache[line[0]]
-                    else:
-                        print line
-                        commentwriter.writerow(line)
-                for chump, comment in self._comment_store_cache.iteritems():
-                    print chump
-                    commentwriter.writerow([chump] + comment )
+        _ , path = mkstemp()
+        tempfile = open(path, 'wb+')
+        commentwriter = csv.writer(tempfile, delimiter=',')
+        with self.lock:
+            for line in self._read_from_file(self.data_file_path):
+                if line[0] in self._comment_store_cache:
+                    commentwriter.writerow([line[0]] + \
+                                            self._comment_store_cache[line[0]])
+                    del self._comment_store_cache[line[0]]
+                else:
+                    commentwriter.writerow(line)
+            for chump, comment in self._comment_store_cache.iteritems():
+                        commentwriter.writerow([chump] + comment )
+        #os.remove(self.data_file_path)
         shutil.move(path, self.data_file_path)
         tempfile.close()
         self._dirty = False
+
+    def _read_from_file(self, file_to_read):
+        '''
+        returnsn a generator object that generates the
+        lists in the given file
+        '''
+        if not os.path.exists(file_to_read):
+            return
+        with open(file_to_read, 'rb') as comment_file:
+            commentreader = csv.reader(comment_file, delimiter=',')
+            # maybe the comment reader should just be returned...
+            # as it is a generator (i think)
+            # this isn't really that helpful
+            for row in commentreader:
+                yield row
+
 
 
