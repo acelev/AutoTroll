@@ -96,7 +96,6 @@ class TestCommentStore(unittest.TestCase):
         last_comment = self.comment_store.get_last_trolled_comment(self.chump)
         self.assertEqual(self.submissions_id, last_comment)
 
-    @unittest.skip("skipping")
     def test_writeback_does_not_overwrite_old_cache(self):
         '''
         Test to see if there is a writeback that the previously written data
@@ -119,10 +118,10 @@ class TestCommentStore(unittest.TestCase):
                 self.assertIn(self.chump, line_one)
                 self.assertIn(self.submissions_id, line_one)
                 line_two = commentreader.next()
-                self.asertIn(self.chump + "eggs", line_two)
-                self.assertIs(self.submissions_id + "spam", line_two)
-            except Exception :
-                self.fail("File did not get written properly")
+                self.assertIn(self.chump + "eggs", line_two)
+                self.assertIn(self.submissions_id + "spam", line_two)
+            except Exception as e:
+                self.fail(str(e))
 
 
 

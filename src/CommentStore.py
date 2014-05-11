@@ -117,5 +117,3 @@ class CommentStore():
             for row in commentreader:
                 yield row
 
-
-
