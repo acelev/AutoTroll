@@ -48,7 +48,7 @@ class TestAutoTrollThread(unittest.TestCase):
 
     def test_AutoTrollPostNotCommentOrSubmission(self):
         # not sure how this is suppose to respond yet
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             self.troll._post("foo bar", {})
 
     def test_getInsult(self):
@@ -59,12 +59,20 @@ class TestAutoTrollThread(unittest.TestCase):
         self.assertIsInstance(insult, str)
         self.assertGreater(len(insult), 1)
 
+    def test_timeout_time_minutes(self):
+        minutes = self.troll.get_timeout_time("foo bar baz qux. 57 minutes.")
+        self.assertEqual(minutes, 57*60)
+
+    def test_timeout_time_seconds(self):
+        seconds = self.troll.get_timeout_time("foo bar baz qux 30 seconds.")
+        self.assertEqual(seconds, 60)
+
 
 def get_login():
     with open('passwords.txt') as password:
         line = password.readline().split('=')
     login = line[0]
-    password = line[1].strip('/n')
+    password = line[1].strip('\n')
     return login, password
 
 if __name__ == '__main__':

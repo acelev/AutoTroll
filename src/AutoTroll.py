@@ -1,4 +1,3 @@
-import optarg
 import sys
 import praw
 from CommentStore import comment_store
@@ -7,12 +6,12 @@ from AutoTrollThread import AutoTrollThread
 
 def main(*args, **kwargs):
     """
-     
-    """ 
+
+    """
 
 def create_auto_trolls(n):
     """
-    creates n auto trolls 
+    creates n auto trolls
     this will take at least 2 * n seconds because reddit only allows one
     request every two seconds
     params:
@@ -29,9 +28,11 @@ def read_passwords_file(password_file):
         password_file (string) the path to the file
     returns:
         a list of tuples (login, password)
-    
+
     """
-    pass
+    return [(line[0], line[1].strip('\n')) for line in
+            map(lambda x: x.split('='), open(password_file, 'r'))]
+
 
 def get_sbumissions(chump):
     """
@@ -46,5 +47,5 @@ def shell():
     """
     not sure what to call this....
     Acts as a repl for the AutoTroll
-    """ 
+    """
     pass

@@ -1,11 +1,11 @@
-#Auto Troll
-#Author: Ace Levenberg (acelevenberg@gmail.com)
-#----------------------------------------------------------------------------
-#"THE BEER-WARE LICENSE" (Revision 42):
-#<acelevenberg@gmail.com> wrote this file. As long as you retain this notice you
-#can do whatever you want with this stuff. If we meet some day, and you think
-#this stuff is worth it, you can buy me a beer in return
-#----------------------------------------------------------------------------
+# Auto Troll
+# Author: Ace Levenberg (acelevenberg@gmail.com)
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# <acelevenberg@gmail.com> wrote this file. As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return
+# ----------------------------------------------------------------------------
 
 import threading
 import urllib2
@@ -17,6 +17,8 @@ from Queue import Queue
 import praw
 
 from CommentStore import comment_store
+
+
 class AutoTrollThread(threading.Thread):
 
     """
@@ -30,6 +32,7 @@ class AutoTrollThread(threading.Thread):
     """
     INSULT_RETRIES = 1
     POST_RETRIES = 1
+
     def __init__(self, username, password):
         """
         creates an instance of AutoTrollThread
@@ -79,29 +82,46 @@ class AutoTrollThread(threading.Thread):
         """
         #"parses" the html, I need to find one tag that is at the top level
         #this is just how insultgenerator works I know its dirty
-        response = urllib2.urlopen('http://insultgenerator.org')
-        insult = ""
-        for line in response:
-            match_object = re.match(r'<TR align=center><TD>(.*)', line)
-            if match_object is not None:
-                insult = match_object.group(1)
-                break
-        response.close()
-        return insult
-
-    def post(self, comment_to_troll):
         i = self.INSULT_RETRIES + 1
         insult = None
         while i > 0:
             try:
-                insult = self.get_insult()
+                response = urllib2.urlopen('http://insultgenerator.org')
+                insult = ""
+                for line in response:
+                    match_object = re.match(r'<TR align=center><TD>(.*)', line)
+                    if match_object is not None:
+                        insult = match_object.group(1)
+                        break
+                response.close()
             except requests.HTTPError as e:
                 # Log the error and try again
                 # log error
                 i -= 1
                 continue
             break
+        return insult
+
+    def get_timeout_time(self, error_string):
+        """
+        inputs:
+            error_string (str) the error return from reddit when you are posting to much
+        returns:
+            the number of seconds to wait before posting again
+        """
+        error_string = error_string.split(' ')
+        # if the wiat time is under a minute just wait a minute
+        if "minutes." not in error_string:
+            return 60
+        else:
+            minutes = error_string[error_string.index('minutes.') - 1]
+            return int(minutes) * 60
+
+
+    def post(self, comment_to_troll):
+        insult = self.get_insult()
         if insult is not None:
+            comment_to_troll.reddit_session = self.reddit
             response = None
             i = self.POST_RETRIES + 1
             while i > 0:
@@ -114,7 +134,10 @@ class AutoTrollThread(threading.Thread):
                     response = self._post(insult, comment_to_troll)
                 except praw.errors.RateLimitExceeded as e:
                     # Log error
-                    time.sleep(600)
+                    print str(e)
+                    print "Trying again in 10 minutes"
+                    time.sleep(self.get_timeout_time(str(e)))
+                    i -= 1
                     continue
                 except praw.errors.APIException as e:
                     # log error
@@ -139,7 +162,6 @@ class AutoTrollThread(threading.Thread):
         return reply_func
 
     def _post(self, response, comment):
-            comment.reddit_session = self.reddit
             reply_func = self._get_reply_func(comment)
             return reply_func(response)
 
