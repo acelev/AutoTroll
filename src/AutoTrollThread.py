@@ -97,8 +97,12 @@ class AutoTrollThread(threading.Thread):
             except requests.HTTPError as e:
                 # Log the error and try again
                 # log error
+                print str(e)
                 i -= 1
                 continue
+            except urllib2.URLError as e:
+                print str(e)
+                i -= 1
             break
         return insult
 
@@ -129,14 +133,16 @@ class AutoTrollThread(threading.Thread):
                     comment_to_troll.downvote()
                 except praw.errors.APIException as e:
                     # log error
-                    pass
+                    print str(e)
                 try:
                     response = self._post(insult, comment_to_troll)
                 except praw.errors.RateLimitExceeded as e:
                     # Log error
-                    print str(e)
-                    print "Trying again in 10 minutes"
-                    time.sleep(self.get_timeout_time(str(e)))
+                    error = str(e)
+                    timeout = self.get_timeout_time(error)
+                    print error
+                    print "Trying again in %s minutes", timeout
+                    time.sleep(timeout)
                     i -= 1
                     continue
                 except praw.errors.APIException as e:
