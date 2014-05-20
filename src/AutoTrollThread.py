@@ -115,10 +115,10 @@ class AutoTrollThread(threading.Thread):
         """
         error_string = error_string.split(' ')
         # if the wiat time is under a minute just wait a minute
-        if "minutes." not in error_string:
+        if "minutes.`" not in error_string:
             return 60
         else:
-            minutes = error_string[error_string.index('minutes.') - 1]
+            minutes = error_string[error_string.index('minutes.`') - 1]
             return int(minutes) * 60
 
 
@@ -136,18 +136,29 @@ class AutoTrollThread(threading.Thread):
                     print str(e)
                 try:
                     response = self._post(insult, comment_to_troll)
+                    self.comment_store.store_comment(self.username,
+                                                     comment_to_troll.author,
+                                                     comment_to_troll.fullname,
+                                                     response.fullname,
+                                                     response.created)
+
                 except praw.errors.RateLimitExceeded as e:
                     # Log error
                     error = str(e)
                     timeout = self.get_timeout_time(error)
+                    print "TROLL = " + self.username
                     print error
-                    print "Trying again in %s minutes", timeout
+                    if timeout == 60:
+                        print "Try again in a minute"
+                    else:
+                        print "Trying again in {0} minutes".format(timeout/60)
                     time.sleep(timeout)
                     i -= 1
                     continue
                 except praw.errors.APIException as e:
                     # log error
-                    pass
+                    print str(e)
+
                 break
             if response is None:
                 # Log the error
