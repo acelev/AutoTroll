@@ -4,13 +4,12 @@ import sys
 import praw
 sys.path.insert(0, os.path.dirname("../src/AutoTroll.py"))
 from AutoTrollThread import AutoTrollThread
-from AutoTroll import read_passwords_file
+from AutoTroll import read_passwords_file, AutoTrollManager
 
 
 class FunctionalTests(unittest.TestCase):
     TEST_SUB = 'AutoTroll'
 
-    @unittest.skip
     def test_reply_to_comment(self):
         """
         logs in with the first user in passwords.txt
@@ -19,13 +18,12 @@ class FunctionalTests(unittest.TestCase):
         login, password = read_passwords_file('passwords.txt')[0]
         auto_troll = AutoTrollThread(login, password)
         self.reddit = praw.Reddit(user_agent="AutoTroll Test")
-        bot_circle_jerk = self.reddit.get_subreddit("botcirclejerk")
+        bot_circle_jerk = self.reddit.get_subreddit("self.TEST_SUB")
         comment = bot_circle_jerk.get_comments().next()
         auto_troll.start()
         auto_troll.send(comment)
         auto_troll.close()
 
-    @unittest.skip
     def test_reply_to_submission(self):
         """
         logs in with the first two logins
@@ -64,6 +62,14 @@ class FunctionalTests(unittest.TestCase):
         print "all sent"
         auto_troll_1.close()
         auto_troll_2.close()
+
+class AutoTrollManagerFunctionalTests(unittest.TestCase):
+
+    def test_general_auto_troll_manager(self):
+        # not the only project where a TrollManager has been a thing...
+        troll_manager = AutoTrollManager()
+        logins = read_passwords_file('passwords.txt')
+        troll_manager.add_chump(logins[0][0])
 
 if __name__ == '__main__':
     unittest.main()

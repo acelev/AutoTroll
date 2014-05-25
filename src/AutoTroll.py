@@ -59,7 +59,8 @@ class AutoTrollManager():
         params:
             logins, a list of tuples containing username, password pairs
         """
-        pass
+        for login, password in logins:
+            self.add_troll(login, password)
 
     def _create_auto_trolls(self, login_info):
         """
@@ -82,7 +83,7 @@ class AutoTrollManager():
         params:
             chump (string) the chump thats getting trolled
         returns:
-            list of praw_comments and praw_submissions
+            generator object of praw_comments and praw_submissions
         """
         pass
 
@@ -92,13 +93,22 @@ class AutoTrollManager():
         input:
             none
         returns:
-            a list of submissions and comments
+            a list of generator objects containing comments and submissions
         """
 
         submissions = []
         for chump in self.chumps:
-            submisions.extend(self.get_sbumissions(chump)
+            submissions.add(self.get_sbumissions(chump))
+        return submissions
 
+    def send_submissions_to_trolls(self, submissions):
+        """
+        distributes the submissionms to the army of trolls
+        input :
+            submissions is an iterable object containing
+            iterable objects of praw_submissions and comments
+        """
+        pass
 
 def read_passwords_file(password_file):
     """
