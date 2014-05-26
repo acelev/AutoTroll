@@ -100,9 +100,9 @@ class AutoTrollThread(threading.Thread):
                 print str(e)
                 i -= 1
                 continue
-            except urllib2.URLError as e:
+            except Exception as e:
                 print str(e)
-                i -= 1
+                i -=1
                 continue
             break
         return insult
@@ -158,7 +158,7 @@ class AutoTrollThread(threading.Thread):
                     continue
                 except praw.errors.APIException as e:
                     # log error
-
+                    print str(e)
                 break
             if response is None:
                 # Log the error

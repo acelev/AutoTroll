@@ -134,6 +134,28 @@ class TestCommentStore(unittest.TestCase):
             except Exception as e:
                 self.fail(str(e))
 
+    def test_writeback_does_not_write_removed_chump(self):
+        comment = [self.troll, self.submissions_id, self.reponse_id, self.time]
+        with open(self.data_store_file, 'wb+') as comment_file:
+            commentwriter = csv.writer(comment_file, delimiter=',')
+            commentwriter.writerow([self.chump] + comment)
+        self.comment_store._comment_store_cache[self.chump+"eggs"] = [self.troll,
+                                                                    self.submissions_id + "spam",
+                                                                    self.reponse_id,
+                                                                    self.time]
+        self.comment_store._dirty = True
+        self.comment_store._write_to_file()
+        self.comment_store.remove_chump(self.chump + "eggs")
+        self.comment_store._write_to_file()
+        with open(self.data_store_file, 'rb') as comment_file:
+            commentreader = csv.reader(comment_file, delimiter=',')
+            line_one = commentreader.next()
+            self.assertIn(self.chump, line_one)
+            self.assertIn(self.submissions_id, line_one)
+            with self.assertRaises(Exception):
+                next(commentreader)
+
+
 
 
 

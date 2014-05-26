@@ -18,6 +18,7 @@ class ChumpManager():
         self.chumps = []
         self.reddit = praw.Reddit(user_agent="AutoTroll v0.1")
         self.commnet_store = comment_store()
+        self.removed_chumps = set()
 
     def delete_chump(self, chump):
         """
@@ -30,7 +31,8 @@ class ChumpManager():
         # ChumpManager.get_all_submissions() that returns a generator object
         # that walks through the submissions in each chump we could potentially
         # delete that chump while it is in use by the generator...
-        pass
+        self.commnet_store.remove_chump(chump)
+        self.removed_chumps.add(chump)
 
     def add_chump(self, chump):
         """
@@ -98,7 +100,7 @@ class AutoTrollManager():
         # close the thread
         # there needs to be a thread clean up that deletes the objects
         # once their queues are empty
-        # it could aslo steadl the submissions from the threads and then
+        # it could aslo steal the submissions from the threads and then
         # remove them from the threads, and insert them elsewhere (probably a
         # better option)
         pass

@@ -13,6 +13,7 @@ import shutil
 
 from threading import Lock
 from tempfile import mkstemp
+#from Set import set
 
 __comment_sotre = None
 def comment_store():
@@ -38,6 +39,7 @@ class CommentStore():
     def __init__(self, data_file_path='comment_store.csv'):
         self._dirty = False
         self._comment_store_cache = dict()
+        self._removed_chumps = set()
         self.lock = Lock()
         self.data_file_path = data_file_path
 
@@ -81,7 +83,7 @@ class CommentStore():
 
     def get_stored_chumps(self):
         """
-        Gets the next chump in line
+        Gets the the chumps sotred in the cache file
         params:
             None
         returns:
@@ -95,6 +97,18 @@ class CommentStore():
             yield chump
 
 
+    def remove_chump(self, chump):
+        """
+        Removes the given chump from the cahce entirley
+        params:
+            chump (string) the chump to remove from the cache
+        """
+        self._dirty = True
+        with self.lock:
+            if chump in self._comment_store_cache:
+                del self._comment_store_cache[chump]
+            self._removed_chumps.add(chump)
+
 
     def _write_to_file(self):
         """
@@ -107,16 +121,23 @@ class CommentStore():
         tempfile = open(path, 'wb+')
         commentwriter = csv.writer(tempfile, delimiter=',')
         with self.lock:
+            # walk through the old cache file
             for line in self._read_from_file(self.data_file_path):
+                # write the updated cache info
                 if line[0] in self._comment_store_cache:
                     commentwriter.writerow([line[0]] + \
                                             self._comment_store_cache[line[0]])
                     del self._comment_store_cache[line[0]]
-                else:
+                # if the chump hasn't been added to removed chumps, just write
+                # the same line from the original cache
+                elif line[0] not in self._removed_chumps:
                     commentwriter.writerow(line)
+                else:
+                    self._removed_chumps.discard(line[0])
+            # add all the chumps in the cache list that aren't in the original
+            # cache file
             for chump, comment in self._comment_store_cache.iteritems():
                         commentwriter.writerow([chump] + comment )
-        #os.remove(self.data_file_path)
         shutil.move(path, self.data_file_path)
         tempfile.close()
         self._dirty = False
