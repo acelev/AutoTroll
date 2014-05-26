@@ -96,6 +96,17 @@ class TestCommentStore(unittest.TestCase):
         last_comment = self.comment_store.get_last_trolled_comment(self.chump)
         self.assertEqual(self.submissions_id, last_comment)
 
+    def test_comment_store_get_next_chump(self):
+        comment = {self.chump :
+                   [self.troll, self.submissions_id, self.reponse_id, self.time]}
+        with open(self.data_store_file, 'wb+') as comment_file:
+            commentwriter = csv.writer(comment_file, delimiter=',')
+            commentwriter.writerow([self.chump] + comment[self.chump])
+            commentwriter.writerow([self.chump + "eggs"] + comment[self.chump])
+        chump_names = [self.chump, self.chump + "eggs"]
+        for chump in self.comment_store.get_stored_chumps():
+            self.assertIn(chump, chump_names)
+
     def test_writeback_does_not_overwrite_old_cache(self):
         '''
         Test to see if there is a writeback that the previously written data

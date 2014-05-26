@@ -68,13 +68,32 @@ class CommentStore():
         returns:
            the last comment/submission id to be trolled
         '''
-        if chump in self._comment_store_cache:
-            return self._comment_store_cache[chump][1]
+        with self.lock:
+            if chump in self._comment_store_cache:
+                return self._comment_store_cache[chump][1]
         for line in self._read_from_file(self.data_file_path):
             # add all of the chumnps we see to the cache
-            self._comment_store_cache[line[0]] = line[1:]
+            with self.lock:
+                self._comment_store_cache[line[0]] = line[1:]
             if line[0] == chump:
                 return self._comment_store_cache[line[0]][1]
+
+
+    def get_stored_chumps(self):
+        """
+        Gets the next chump in line
+        params:
+            None
+        returns:
+            a generator object of chumps all read from the csv file
+        """
+        for line in self._read_from_file(self.data_file_path):
+            chump = line[0]
+            with self.lock:
+                if chump not in self._comment_store_cache:
+                    self._comment_store_cache[chump] = line[1:]
+            yield chump
+
 
 
     def _write_to_file(self):
@@ -104,7 +123,7 @@ class CommentStore():
 
     def _read_from_file(self, file_to_read):
         '''
-        returnsn a generator object that generates the
+        returns a generator object that generates the
         lists in the given file
         '''
         if not os.path.exists(file_to_read):
