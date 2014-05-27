@@ -7,7 +7,7 @@ class AutoTrollManager():
     def __init__(self, max_submission_threshold=-1):
         self.trolls = dict()
         self._removed_trolls = dict()
-        self._troll_generator = self._next_troll()
+        self._troll_generator = self._get_next_troll()
         self.submission_threshhold = max_submission_threshold
         self._next_troll = None
 
