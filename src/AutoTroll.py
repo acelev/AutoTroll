@@ -2,13 +2,14 @@ import sys
 import praw
 from CommentStore import comment_store
 from AutoTrollThread import AutoTrollThread
-from sets import Set
 
 
 def main(*args, **kwargs):
     """
 
     """
+    pass
+
 
 class ChumpManager():
     """
@@ -46,7 +47,7 @@ class ChumpManager():
 
     def get_sbumissions(self, chump):
         """
-        gets the newest submissions of the user
+        gets the newest submissions of the chump
         params:
             chump (string) the chump thats getting trolled
         returns:
@@ -87,8 +88,8 @@ class ChumpManager():
 class AutoTrollManager():
 
     def __init__(self):
-        self.trolls = []
-        self._removed_trolls = []
+        self.trolls = dict()
+        self._removed_trolls = dict()
 
     def remove_troll(self, username):
         """
@@ -142,12 +143,11 @@ class AutoTrollManager():
                                     lambda user, password: AutoTrollThread(user, password),
                                     login_info)]
 
-    def send_submissions_to_trolls(self, submissions):
+    def send_submission(self, submission):
         """
-        distributes the submissionms to the army of trolls
-        input :
-            submissions is an iterable object containing
-            iterable objects of praw_submissions and comments
+        sends a submission to the Troll with the least load on it
+        input:
+            submission(praw submission object) submission to troll
         """
         pass
 

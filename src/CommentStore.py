@@ -1,11 +1,11 @@
-#Auto Troll
-#Author: Ace Levenberg (acelevenberg@gmail.com)
-#----------------------------------------------------------------------------
-#"THE BEER-WARE LICENSE" (Revision 42):
-#<acelevenberg@gmail.com> wrote this file. As long as you retain this notice you
-#can do whatever you want with this stuff. If we meet some day, and you think
-#this stuff is worth it, you an buy me a beer in return Ace Levenberg
-#----------------------------------------------------------------------------
+# Auto Troll
+# Author: Ace Levenberg (acelevenberg@gmail.com)
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# <acelevenberg@gmail.com> wrote this file. As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you an buy me a beer in return Ace Levenberg
+# ----------------------------------------------------------------------------
 
 import csv
 import os
@@ -13,7 +13,6 @@ import shutil
 
 from threading import Lock
 from tempfile import mkstemp
-#from Set import set
 
 __comment_sotre = None
 def comment_store():

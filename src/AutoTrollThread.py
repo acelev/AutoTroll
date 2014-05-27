@@ -107,6 +107,13 @@ class AutoTrollThread(threading.Thread):
             break
         return insult
 
+    def get_submissions_left(self):
+        """
+        gets the number of submissions left in the queue (not reliable!)
+        returns:
+            the number of submissions left
+        """
+        return self.input_queue.qsize()
     def get_timeout_time(self, error_string):
         """
         inputs:
@@ -181,7 +188,6 @@ class AutoTrollThread(threading.Thread):
     def _post(self, response, comment):
             reply_func = self._get_reply_func(comment)
             return reply_func(response)
-
 
 
 
