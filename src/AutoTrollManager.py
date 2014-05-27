@@ -7,7 +7,7 @@ class AutoTrollManager():
     def __init__(self, max_submission_threshold=-1):
         self.trolls = dict()
         self._removed_trolls = dict()
-        self._troll_generator = self._get_next_troll()
+        self._next_troll_generator = self._find_next_troll()
         self.submission_threshhold = max_submission_threshold
         self._next_troll = None
 
@@ -59,6 +59,7 @@ class AutoTrollManager():
         """
         # set the next troll so we do not cycle through the list again
         self._next_troll = self._get_next_troll()
+        print self._next_troll
         return self._next_troll is not None
 
     def troll_submission(self, submission):
@@ -82,11 +83,14 @@ class AutoTrollManager():
             else:
                 next_troll.send(submission)
 
+    # actually calls the generator to get the next troll
+    def _get_next_troll(self):
+        return self._next_troll_generator.next()
 
     # gets the next troll to use if there is a threshold for submissions it
     # will skip over the trolls that have met the threshold, if there are no
     # trolls avialable it will yield none
-    def _get_next_troll(self):
+    def _find_next_troll(self):
         # the troll we started the search on
         start_troll = None
         while True:
